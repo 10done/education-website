@@ -5,7 +5,6 @@ import time
 import uuid
 from datetime import datetime, timedelta
 from io import BytesIO
-from urllib.parse import parse_qs, urlparse
 
 from allauth.account.signals import user_signed_up
 from django.conf import settings
@@ -686,36 +685,6 @@ class EducationalVideo(models.Model):
 
     def __str__(self):
         return self.title
-
-    @property
-    def thumbnail_url(self):
-        """
-        Build the URL for YouTube’s high-quality default thumbnail.
-        Returns None if this isn’t a YouTube video.
-        """
-        vid = self.youtube_id
-        if vid:
-            return f"https://img.youtube.com/vi/{vid}/hqdefault.jpg"
-        return None
-
-    @property
-    def youtube_id(self):
-        """
-        Extract the YouTube video ID, whether it's a long or short URL.
-        Returns None if not a YouTube link.
-        """
-        parsed = urlparse(self.video_url)
-        host = parsed.netloc.lower()
-
-        # youtu.be/<id>
-        if host in ("youtu.be", "www.youtu.be"):
-            return parsed.path.lstrip("/")
-
-        # youtube.com/watch?v=<id>
-        if "youtube.com" in host:
-            return parse_qs(parsed.query).get("v", [None])[0]
-
-        return None
 
 
 class Achievement(models.Model):
